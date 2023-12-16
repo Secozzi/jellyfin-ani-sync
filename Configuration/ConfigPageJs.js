@@ -1,5 +1,5 @@
 var PluginConfig = {
-    pluginUniqueId: 'c78f11cf-93e6-4423-8c42-d2c255b70e47'
+    pluginUniqueId: 'e2c780d0-9158-4bd8-bd01-8c16d05bb674'
 };
 
 export default function (view, params) {

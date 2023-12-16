@@ -15,7 +15,7 @@ namespace jellyfin_ani_sync {
         }
 
         public override string Name => "Ani-Sync";
-        public override Guid Id => Guid.Parse("c78f11cf-93e6-4423-8c42-d2c255b70e47");
+        public override Guid Id => Guid.Parse("e2c780d0-9158-4bd8-bd01-8c16d05bb674");
         public override string Description => "Synchronize anime watch status between Jellyfin and anime tracking sites.";
         public PluginConfiguration PluginConfiguration => Configuration;
         public static Plugin? Instance { get; private set; }

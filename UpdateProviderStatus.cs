@@ -94,11 +94,25 @@ namespace jellyfin_ani_sync {
                     return;
                 }
 
+                string? aniListSeasonId = episode.Season.Studios.FirstOrDefault(s => s.StartsWith("anilist", StringComparison.OrdinalIgnoreCase));
+                if (aniListSeasonId != null) {
+                    _logger.LogInformation("Season ID for AniList found.");
+
+                    string id = aniListSeasonId.Substring(8);
+                            // Parse the numeric part to an integer
+                    if (int.TryParse(id, out int result)) {
+                        _apiIds.Anilist = result;
+                    } else {
+                        _logger.LogWarning("Invalid form for: " + aniListSeasonId);
+                    }
+                }
+
                 (int? aniDbId, int? episodeOffset) aniDbId = (null, null);
                 if (_animeType == typeof(Episode)
                         ? episode.ProviderIds != null &&
                           episode.Series.ProviderIds.ContainsKey("AniList") &&
                           episode.Season.IndexNumber.Value == 1 &&
+                          _apiIds.Anilist == null &&
                           int.TryParse(episode.Series.ProviderIds["AniList"], out int retrievedAniListId)
                         : movie.ProviderIds != null &&
                           movie.ProviderIds.ContainsKey("AniList") &&
@@ -131,6 +145,7 @@ namespace jellyfin_ani_sync {
                             };
                             _logger.LogWarning("Did not get provider IDs, defaulting to episode provided AniDb ID");
                         } else {
+                            _apiIds.Anilist = 8237;
                             _logger.LogInformation("Retrieved provider IDs");
                         }
                     }

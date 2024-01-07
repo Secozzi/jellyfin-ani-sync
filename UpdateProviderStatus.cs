@@ -108,48 +108,6 @@ namespace jellyfin_ani_sync {
                 }
 
                 (int? aniDbId, int? episodeOffset) aniDbId = (null, null);
-                if (_animeType == typeof(Episode)
-                        ? episode.ProviderIds != null &&
-                          episode.Series.ProviderIds.ContainsKey("AniList") &&
-                          episode.Season.IndexNumber.Value == 1 &&
-                          _apiIds.Anilist == null &&
-                          int.TryParse(episode.Series.ProviderIds["AniList"], out int retrievedAniListId)
-                        : movie.ProviderIds != null &&
-                          movie.ProviderIds.ContainsKey("AniList") &&
-                          int.TryParse(movie.ProviderIds["AniList"], out retrievedAniListId)) {
-                    _logger.LogInformation("AniList ID found. Retrieving provider IDs from offline database...");
-                    _apiIds = await AnimeOfflineDatabaseHelpers.GetProviderIdsFromMetadataProvider(_httpClientFactory.CreateClient(NamedClient.Default), retrievedAniListId, AnimeOfflineDatabaseHelpers.Source.Anilist);
-                    if (_apiIds is null) {
-                        _apiIds = new AnimeOfflineDatabaseHelpers.OfflineDatabaseResponse {
-                            Anilist = retrievedAniListId
-                        };
-                        _logger.LogWarning("Did not get provider IDs, defaulting to episode provided AniList ID");
-                    } else {
-                        _logger.LogInformation("Retrieved provider IDs");
-                    }
-                } else if (_animeType == typeof(Episode)
-                               ? (episode.Series.ProviderIds.ContainsKey("Tvdb") ||
-                                  episode.Season.ProviderIds.ContainsKey("Anidb") ||
-                                  episode.Series.ProviderIds.ContainsKey("Anidb"))
-                               : movie.ProviderIds != null &&
-                                 movie.ProviderIds.ContainsKey("Anidb")) {
-                    aniDbId = _animeType == typeof(Episode)
-                        ? await AnimeListHelpers.GetAniDbId(_logger, _loggerFactory, _httpClientFactory, _applicationPaths, episode, episode.IndexNumber.Value, episode.Season.IndexNumber.Value)
-                        : await AnimeListHelpers.GetAniDbId(_logger, _loggerFactory, _httpClientFactory, _applicationPaths, movie, movie.IndexNumber.Value, 1);
-                    if (aniDbId.aniDbId != null) {
-                        _logger.LogInformation("Retrieving provider IDs from offline database...");
-                        _apiIds = await AnimeOfflineDatabaseHelpers.GetProviderIdsFromMetadataProvider(_httpClientFactory.CreateClient(NamedClient.Default), aniDbId.aniDbId.Value, AnimeOfflineDatabaseHelpers.Source.Anidb);
-                        if (_apiIds is null) {
-                            _apiIds = new AnimeOfflineDatabaseHelpers.OfflineDatabaseResponse {
-                                AniDb = aniDbId.aniDbId
-                            };
-                            _logger.LogWarning("Did not get provider IDs, defaulting to episode provided AniDb ID");
-                        } else {
-                            _apiIds.Anilist = 8237;
-                            _logger.LogInformation("Retrieved provider IDs");
-                        }
-                    }
-                }
 
                 foreach (UserApiAuth userApiAuth in _userConfig.UserApiAuth) {
                     _apiName = userApiAuth.Name;

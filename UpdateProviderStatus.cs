@@ -87,13 +87,13 @@ namespace jellyfin_ani_sync {
             }
 
             if (LibraryCheck(_userConfig, _libraryManager, _fileSystem, _logger, e) && video is Episode or Movie && playedToCompletion) {
-                if ((video is Episode && (episode.IndexNumber == null ||
-                                          episode.Season.IndexNumber == null)) ||
+                if ((video is Episode && (episode.IndexNumber == null)) ||
                     (video is Movie && movie.IndexNumber == null)) {
                     _logger.LogError("Video does not contain required index numbers to sync; skipping");
                     return;
                 }
 
+                int seasonNumber = 1;
                 string? aniListSeasonId = episode.Season.Studios.FirstOrDefault(s => s.StartsWith("anilist", StringComparison.OrdinalIgnoreCase));
                 if (aniListSeasonId != null) {
                     _logger.LogInformation("Season ID for AniList found.");
@@ -115,7 +115,7 @@ namespace jellyfin_ani_sync {
                     switch (userApiAuth.Name) {
                         case ApiName.Mal:
                             _apiCallHelpers = new ApiCallHelpers(malApiCalls: new MalApiCalls(_httpClientFactory, _loggerFactory, _serverApplicationHost, _httpContextAccessor, _userConfig));
-                            if (_apiIds.MyAnimeList != null && _apiIds.MyAnimeList != 0 && (episode != null && episode.Season.IndexNumber.Value != 0)) {
+                            if (_apiIds.MyAnimeList != null && _apiIds.MyAnimeList != 0 && (episode != null)) {
                                 await CheckUserListAnimeStatus(_apiIds.MyAnimeList.Value, _animeType == typeof(Episode)
                                         ? (aniDbId.episodeOffset != null
                                             ? episode.IndexNumber.Value - aniDbId.episodeOffset.Value
@@ -128,7 +128,7 @@ namespace jellyfin_ani_sync {
                             break;
                         case ApiName.AniList:
                             _apiCallHelpers = new ApiCallHelpers(aniListApiCalls: new AniListApiCalls(_httpClientFactory, _loggerFactory, _serverApplicationHost, _httpContextAccessor, _userConfig));
-                            if (_apiIds.Anilist != null && _apiIds.Anilist != 0 && (episode != null && episode.Season.IndexNumber.Value != 0)) {
+                            if (_apiIds.Anilist != null && _apiIds.Anilist != 0 && (episode != null)) {
                                 await CheckUserListAnimeStatus(_apiIds.Anilist.Value, _animeType == typeof(Episode)
                                         ? (aniDbId.episodeOffset != null
                                             ? episode.IndexNumber.Value - aniDbId.episodeOffset.Value
@@ -136,7 +136,7 @@ namespace jellyfin_ani_sync {
                                         : movie.IndexNumber.Value,
                                     false);
                                 continue;
-                            } else if (_animeType == typeof(Episode) ? episode.Series.ProviderIds.ContainsKey("AniList") && episode.Season.IndexNumber.Value == 1 : movie.ProviderIds.ContainsKey("AniList")) {
+                            } else if (_animeType == typeof(Episode) ? episode.Series.ProviderIds.ContainsKey("AniList"): movie.ProviderIds.ContainsKey("AniList")) {
                                 if (_animeType == typeof(Episode) ? int.TryParse(episode.Series.ProviderIds["AniList"], out int aniListId) : int.TryParse(movie.ProviderIds["AniList"], out aniListId)) {
                                     await CheckUserListAnimeStatus(aniListId, _animeType == typeof(Episode)
                                             ? (aniDbId.episodeOffset != null
@@ -151,7 +151,7 @@ namespace jellyfin_ani_sync {
                             break;
                         case ApiName.Kitsu:
                             _apiCallHelpers = new ApiCallHelpers(kitsuApiCalls: new KitsuApiCalls(_httpClientFactory, _loggerFactory, _serverApplicationHost, _httpContextAccessor, _userConfig));
-                            if (_apiIds.Kitsu != null && _apiIds.Kitsu != 0 && (episode != null && episode.Season.IndexNumber.Value != 0)) {
+                            if (_apiIds.Kitsu != null && _apiIds.Kitsu != 0 && (episode != null)) {
                                 await CheckUserListAnimeStatus(_apiIds.Kitsu.Value, _animeType == typeof(Episode)
                                         ? (aniDbId.episodeOffset != null
                                             ? episode.IndexNumber.Value - aniDbId.episodeOffset.Value
@@ -179,7 +179,7 @@ namespace jellyfin_ani_sync {
                                  (_apiIds.Anilist != null && _apiIds.Anilist != 0) ||
                                  (_apiIds.Kitsu != null && _apiIds.Kitsu != 0) ||
                                  (_apiIds.AniDb != null && _apiIds.AniDb != 0)) &&
-                                (episode != null && episode.Season.IndexNumber.Value != 0)) {
+                                (episode != null)) {
                                 await CheckUserListAnimeStatus(_apiIds, _animeType == typeof(Episode)
                                         ? (aniDbId.episodeOffset != null
                                             ? episode.IndexNumber.Value - aniDbId.episodeOffset.Value
@@ -205,9 +205,9 @@ namespace jellyfin_ani_sync {
                                     int episodeNumber = episode.IndexNumber.Value;
                                     if (_apiName != ApiName.Annict) {
                                         // should have already found the appropriate series/season/movie, no need to do other checks
-                                        if (episode?.Season.IndexNumber is > 1) {
+                                        if (seasonNumber is > 1) {
                                             // if this is not the first season, then we need to lookup the related season.
-                                            matchingAnime = await GetDifferentSeasonAnime(anime.Id, episode.Season.IndexNumber.Value);
+                                            matchingAnime = await GetDifferentSeasonAnime(anime.Id, seasonNumber);
                                             if (matchingAnime == null) {
                                                 _logger.LogWarning($"({_apiName}) Could not find next season");
                                                 found = true;
@@ -215,7 +215,7 @@ namespace jellyfin_ani_sync {
                                             }
 
                                             _logger.LogInformation($"({_apiName}) Season being watched is {GetAnimeTitle(matchingAnime)}");
-                                        } else if (episode?.Season.IndexNumber == 0) {
+                                        } else if (seasonNumber == 0) {
                                             // the episode is an ova or special
                                             matchingAnime = await GetOva(anime.Id, episode.Name);
                                             if (matchingAnime == null) {
@@ -228,7 +228,7 @@ namespace jellyfin_ani_sync {
                                             // either we have found the wrong series (highly unlikely) or it is a multi cour series/Jellyfin has grouped next season into the current.
                                             int seasonEpisodeCounter = matchingAnime.NumEpisodes;
                                             int totalEpisodesWatched = 0;
-                                            int seasonCounter = episode.Season.IndexNumber.Value;
+                                            int seasonCounter = seasonNumber;
                                             int episodeCount = episode.IndexNumber.Value;
                                             Anime season = matchingAnime;
                                             bool isRootSeason = false;

@@ -20,6 +20,13 @@
         "sourceUrl": "https://github.com/Secozzi/jellyfin-ani-sync/releases/download/v2.9.2/10.8.10.-.ani-sync_2.9.2.0.zip",
         "timestamp": "2024-01-07 00:00:00",
         "version": "2.9.2.0"
+      },
+      {
+        "checksum": "e8ad40f1d2bdfaa4e169f76a005b4984",
+        "changelog": "1. Ignore season index",
+        "sourceUrl": "https://github.com/Secozzi/jellyfin-ani-sync/releases/download/v2.9.3/10.8.10.-.ani-sync_2.9.3.0.zip",
+        "timestamp": "2024-01-22 00:00:00",
+        "version": "2.9.3.0"
       }
     ]
   }

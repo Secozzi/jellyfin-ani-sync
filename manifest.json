@@ -27,6 +27,13 @@
         "sourceUrl": "https://github.com/Secozzi/jellyfin-ani-sync/releases/download/v2.9.3/10.8.10.-.ani-sync_2.9.3.0.zip",
         "timestamp": "2024-01-22 00:00:00",
         "version": "2.9.3.0"
+      },
+      {
+        "checksum": "88ed288d1c4a2a2923b26552047b656a",
+        "changelog": "1. Fix movies",
+        "sourceUrl": "https://github.com/Secozzi/jellyfin-ani-sync/releases/download/v2.9.3/10.8.10.-.ani-sync_2.9.4.0.zip",
+        "timestamp": "2024-01-23 00:00:00",
+        "version": "2.9.4.0"
       }
     ]
   }

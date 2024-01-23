@@ -93,17 +93,26 @@ namespace jellyfin_ani_sync {
                     return;
                 }
 
-                int seasonNumber = 1;
-                string? aniListSeasonId = episode.Season.Studios.FirstOrDefault(s => s.StartsWith("anilist", StringComparison.OrdinalIgnoreCase));
-                if (aniListSeasonId != null) {
-                    _logger.LogInformation("Season ID for AniList found.");
 
-                    string id = aniListSeasonId.Substring(8);
-                            // Parse the numeric part to an integer
-                    if (int.TryParse(id, out int result)) {
+                int seasonNumber = 1;
+                if (_animeType == typeof(Episode)) {
+                    string? aniListSeasonId = episode.Season.Studios.FirstOrDefault(s => s.StartsWith("anilist", StringComparison.OrdinalIgnoreCase));
+                    if (aniListSeasonId != null) {
+                        _logger.LogInformation("Season ID for AniList found.");
+
+                        string id = aniListSeasonId.Substring(8);
+                                // Parse the numeric part to an integer
+                        if (int.TryParse(id, out int result)) {
+                            _apiIds.Anilist = result;
+                        } else {
+                            _logger.LogWarning("Invalid form for: " + aniListSeasonId);
+                        }
+                    }
+                } else {
+                    if (int.TryParse(movie.ProviderIds["AniList"], out int result)) {
                         _apiIds.Anilist = result;
                     } else {
-                        _logger.LogWarning("Invalid form for: " + aniListSeasonId);
+                        _logger.LogWarning("Unable to retrieve anilistId for movie.");
                     }
                 }
 

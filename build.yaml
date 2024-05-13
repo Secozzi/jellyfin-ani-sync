@@ -2,8 +2,8 @@
 name: "Ani-Sync"
 guid: "e2c780d0-9158-4bd8-bd01-8c16d05bb674"
 version: "1.4"
-targetAbi: "10.8.0.0"
-framework: "net6.0"
+targetAbi: "10.9.0.0"
+framework: "net8.0"
 owner: "Secozzi"
 overview: "Synchronize anime watch status"
 description: >

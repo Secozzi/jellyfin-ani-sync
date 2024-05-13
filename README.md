@@ -24,6 +24,14 @@ While I may not commit to the plugin too often, I am still maintaining it. Pleas
 4. Navigate to Plugins in Jellyfin (Settings > Admin Dashboard > Plugins).
 5. Adjust the settings accordingly. I would advise following the detailed instructions on the [wiki page](https://github.com/vosmiic/jellyfin-ani-sync/wiki).
 
+#### Docker
+
+There is a Docker script that will pull the last built Docker image and copy the DLL file to the given directory.
+
+```bash
+docker run --rm -v "/plugin/dir/Ani-Sync:/out" ghcr.io/vosmiic/jellyfin-ani-sync
+```
+
 ## Build
 
 1. To build this plugin you will need [.Net 6.x](https://dotnet.microsoft.com/download/dotnet/6.0).
@@ -55,4 +63,8 @@ We use the API offered by the [arm server repo](https://github.com/BeeeQueue/arm
 Please also help these projects by contributing to the anime database/helping with the API server.
 
 ## Development
+Beta releases can be installed automatically by replacing the manifest URL with `https://raw.githubusercontent.com/vosmiic/jellyfin-ani-sync/master/beta-manifest.json`. This will replace your version with the latest beta release (if there is a beta release more recent than the latest stable release). It will be replaced with the latest stable release when it is released, so both repos can be used at the same time. Authentication and other settings should be carried over. Use at your own risk.
+
 Unit tests can be found [here](https://github.com/vosmiic/jellyfin-ani-sync-unit-tests).
+
+The `docker.sh` file can be used to build and automatically copy the resulting DLL to the correct place. The first argument should be either the path to the Ani-Sync folder or the plugins folder (where it will attempt to find the latest Ani-Sync plugin folder). The second optional argument can be an image, or left empty to build using the Dockerfile.
